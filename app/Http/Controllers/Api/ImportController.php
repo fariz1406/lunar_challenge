@@ -19,12 +19,12 @@ class ImportController extends Controller
     public function store(UploadCsvRequest $request): JsonResponse
     {
 
-        $filePath = $this->importService->handleImport($request->file('file'));
+        $importId = $this->importService->handleImport($request->file('file'));
 
         return response()->json([
             'message' => 'Processing',
-            'file_path' => $filePath,
-            'note' => 'Import sedang berjalan di background.',
-        ], 202); // 202 Accepted
+            'import_id' => $importId,
+            'endpoint_check' => url("/api/import-status/{$importId}"),
+        ], 202);
     }
 }
