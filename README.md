@@ -1,66 +1,71 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Requirement server
+* Laravel yang saya gunakan adalah laravel 11
+* PHP Versi 8.2 atau lebih baru.
+* Composer Terinstal.
+* Database MySQL.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## cara setup project
 
-## About Laravel
+1.  Clone Repository
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+2.  Install Dependencies
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+3.  Konfigurasi Environment (.env)
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=lunar_challenge
+    DB_USERNAME=root
+    DB_PASSWORD=
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+    QUEUE_CONNECTION=database
 
-## Learning Laravel
+5.  Migrate Database
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Cara Menjalankan Aplikasi
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Aplikasi ini membutuhkan dua terminal yang berjalan bersamaan agar proses import di latar belakang bisa bekerja.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Terminal 1: Menjalankan Server API
+php artisan serve
 
-## Laravel Sponsors
+## Terminal 2: Menjalankan Background Worker
+php artisan queue:work
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Tools Testing (Data Dummy)
+Project ini ada command khusus untuk membuat file CSV dummy untuk keperluan testing upload.
 
-### Premium Partners
+Generate jumlah custom (contoh 10.000 data)
+php artisan make:dummy-csv 10000
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+File akan tersimpan di: storage/app/dummy_users.csv
 
-## Contributing
+## Dokumentasi API
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Upload CSV
+Endpoint untuk mengunggah file CSV dan memasukkannya ke antrian.
+- URL: POST /api/upload-csv
+- Headers: Accept: application/json
+- Body (form-data):
 
-## Code of Conduct
+Response Sukses (202 Accepted):
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+{
+    "message": "Processing",
+    "import_id": "uuid-string...",
+    "endpoint_check": "http://localhost:8000/api/import-status/uuid-string..."
+}
 
-## Security Vulnerabilities
+2. Cek Status Import
+Endpoint untuk memantau progress import secara real-time.
+URL: GET /api/import-status/{import_id}
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Response Sukses (200 OK):
+{
+    "status": "processing",
+    "processed": 5000,
+    "total": 100000,
+    "message": "Processed 5000 of 100000 rows"
+}
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Status akan berubah menjadi completed saat selesai.

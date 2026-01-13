@@ -16,7 +16,7 @@ class ImportService
 
     $filename = $file->store('imports');
 
-    $fullPath = storage_path('app/private/' . $filename);
+    $fullPath = storage_path('app/' . $filename);
 
     $importId = (string) Str::uuid();
 
